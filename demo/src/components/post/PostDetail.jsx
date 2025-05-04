@@ -1,34 +1,66 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { usePost } from '../../hooks';
-import CommentList from '../comment/CommentList';
-import CommentForm from '../comment/CommentForm';
-import Loader from '../common/Loader';
-import ErrorMessage from '../common/ErrorMessage';
+// src/components/post/PostDetail.jsx
+import React from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { usePost } from '../../hooks'
+import Loader from '../common/Loader'
+import ErrorMessage from '../common/ErrorMessage'
+import CommentList from '../comment/CommentList'
+import CommentForm from '../comment/CommentForm'
 
-const PostDetail = () => {
-  const { id } = useParams();
-  const { post, loading, error } = usePost(id);
+export default function PostDetail() {
+  const { id } = useParams()
+  const { post, loading, error } = usePost(id)
 
-  if (loading) return <Loader />;
-  if (error) return <ErrorMessage message={error} />;
-  if (!post) return <ErrorMessage message="Post not found" />;
+  if (loading) return <Loader />
+  if (error)   return <ErrorMessage message={error} />
+  if (!post)  return <ErrorMessage message="Post not found" />
 
   return (
-    <div className="max-w-4xl mx-auto mt-8">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <img src={post.image} alt={post.caption} className="w-full h-64 object-cover" />
-        <div className="p-4">
-          <h3 className="text-xl font-semibold">{post.user}</h3>
-          <p className="text-sm text-gray-500">{post.caption}</p>
-        </div>
-      </div>
-      <div className="mt-8">
-        <CommentList />
-        <CommentForm />
-      </div>
-    </div>
-  );
-};
+    <article className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+      <Link to="/" className="block text-indigo-600 dark:text-indigo-400 hover:underline px-6 pt-6">
+        &larr; Back to Feed
+      </Link>
 
-export default PostDetail;
+      {post.image && (
+        <img
+          src={post.image}
+          alt={post.caption}
+          className="w-full h-80 object-cover"
+        />
+      )}
+
+      <div className="p-6 space-y-4">
+        <div className="flex items-center space-x-4">
+          {post.author?.avatar && (
+            <img
+              src={post.author.avatar}
+              alt={post.author.name}
+              className="w-10 h-10 rounded-full"
+            />
+          )}
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              {post.author?.name || 'Unknown'}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              @{post.author?.username}
+            </p>
+          </div>
+        </div>
+
+        <p className="text-gray-700 dark:text-gray-300">
+          {post.caption}
+        </p>
+
+        <time className="text-xs text-gray-500 dark:text-gray-400 block">
+          {new Date(post.createdAt).toLocaleString()}
+        </time>
+      </div>
+
+      <section className="px-6 pb-6 space-y-6">
+        <CommentList postId={id} />
+        <CommentForm postId={id} />
+      </section>
+    </article>
+  )
+}
