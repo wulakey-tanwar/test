@@ -1,7 +1,7 @@
 // src/components/post/PostDetail.jsx
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { usePost } from '../../hooks/usePost';
+import { usePost } from '../../hooks';
 import Loader from '../common/Loader';
 import ErrorMessage from '../common/ErrorMessage';
 import CommentList from '../comment/CommentList';

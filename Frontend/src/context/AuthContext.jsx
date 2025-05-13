@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { loginUser } from '../api/auth';
 
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {

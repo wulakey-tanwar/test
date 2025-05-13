@@ -1,5 +1,5 @@
 // hooks/useAuth.jsx
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuth } from "../context/AuthContext";
 
 export const useAuth = () => {
   return useAuthContext();

@@ -1,9 +1,8 @@
 // src/pages/CreatePostPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createPost } from '../api/post';
-import { useAuth } from '../context/AuthContext.jsx';
-
+import { createPost } from '../../api/post';
+import { useAuth } from '../../context/AuthContext';
 export default function CreatePostPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
