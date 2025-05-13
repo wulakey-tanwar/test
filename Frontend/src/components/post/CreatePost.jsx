@@ -1,26 +1,49 @@
 // src/pages/CreatePostPage.jsx
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPost } from '../api/post';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function CreatePostPage() {
-  const navigate = useNavigate()
-  const [title, setTitle] = useState('')
-  const [message, setMessage] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [error, setError] = useState(null)
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = e => {
-    e.preventDefault()
-    // TODO: integrate API call to create post
-    if (!title.trim() || !message.trim()) {
-      setError('Title and message are required.')
-      return
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
     }
-    // Simulate post creation
-    console.log('Creating post:', { title, message, imageUrl })
-    // After successful creation, redirect to home or detail
-    navigate('/')
-  }
+    
+    if (!title.trim() || !message.trim()) {
+      setError('Title and message are required.');
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const newPost = await createPost({
+        title,
+        content: message,
+        image: imageUrl || null
+      });
+      
+      // After successful creation, redirect to the new post detail page
+      navigate(`/posts/${newPost._id || newPost.id}`);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create post. Please try again.');
+      console.error('Error creating post:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
@@ -44,9 +67,9 @@ export default function CreatePostPage() {
               onChange={e => setTitle(e.target.value)}
               className="w-full p-2 border rounded shadow-sm"
               placeholder="Post title"
+              disabled={isSubmitting}
             />
           </div>
-
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
               Message
@@ -57,9 +80,9 @@ export default function CreatePostPage() {
               className="w-full p-2 border rounded shadow-sm"
               rows={4}
               placeholder="Write your message here"
+              disabled={isSubmitting}
             />
           </div>
-
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
               Image URL (optional)
@@ -70,17 +93,18 @@ export default function CreatePostPage() {
               onChange={e => setImageUrl(e.target.value)}
               className="w-full p-2 border rounded shadow-sm"
               placeholder="https://..."
+              disabled={isSubmitting}
             />
           </div>
-
           <button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg transition"
+            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg transition disabled:bg-indigo-300"
+            disabled={isSubmitting}
           >
-            Publish Post
+            {isSubmitting ? 'Publishing...' : 'Publish Post'}
           </button>
         </form>
       </div>
     </main>
-  )
+  );
 }

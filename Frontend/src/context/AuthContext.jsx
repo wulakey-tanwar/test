@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { loginUser } from '../api/auth';
 
-// Create the context
 const AuthContext = createContext();
 
-// Create the provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
@@ -15,23 +14,24 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      // TODO: Replace with real API call
-      const dummyUser = {
-        id: 1,
-        name: 'John Doe',
-        email,
-        token: 'fake-jwt-token',
+      const res = await loginUser({ email, password });
+      const data = res.data;
+
+      const userData = {
+        id: data.user._id,
+        email: data.user.email,
+        token: data.token,
       };
 
-      // Simulate network delay
-      await new Promise((res) => setTimeout(res, 1000));
-
-      localStorage.setItem('user', JSON.stringify(dummyUser));
-      setUser(dummyUser);
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
       return { success: true };
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, message: 'Login failed' };
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Login failed',
+      };
     } finally {
       setLoading(false);
     }
@@ -51,5 +51,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook for consuming the auth context
 export const useAuth = () => useContext(AuthContext);

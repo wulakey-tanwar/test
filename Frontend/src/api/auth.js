@@ -1,29 +1,12 @@
-import { getToken, setToken, clearToken } from '../utils/localStorage.js';
+// src/api/auth.js
+import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+const authAPI = axios.create({
+  baseURL: import.meta.env.VITE_AUTH_SERVICE_URL, // points to your auth microservice
+  headers: { 'Content-Type': 'application/json' },
+});
 
-export async function login(credentials) {
-  const res = await fetch(`${BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials),
-  });
-  const data = await res.json();
-  if (res.ok) setToken(data.token);
-  return data;
-}
+export const loginUser = (credentials) => authAPI.post('/auth/login', credentials);
+export const registerUser = (credentials) => authAPI.post('/auth/register', credentials);
 
-export async function register(userInfo) {
-  const res = await fetch(`${BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(userInfo),
-  });
-  const data = await res.json();
-  if (res.ok) setToken(data.token);
-  return data;
-}
-
-export function logout() {
-  clearToken();
-}
+export default authAPI;

@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
-import { dummyUsers } from '../../api';
+import React, { useState, useEffect } from 'react';
+import userAPI from '../../api/userAxios';
 
 const UserSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [users, setUsers] = useState(dummyUsers);
+  const [users, setUsers] = useState([]);
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     const term = e.target.value;
     setSearchTerm(term);
-    const filteredUsers = dummyUsers.filter(user =>
-      user.name.toLowerCase().includes(term.toLowerCase()) ||
-      user.email.toLowerCase().includes(term.toLowerCase())
-    );
-    setUsers(filteredUsers);
+    try {
+      const res = await userAPI.get(`/search?query=${term}`);
+      setUsers(res.data);
+    } catch (err) {
+      console.error('User search failed:', err);
+    }
   };
+
+  useEffect(() => {
+    // Optionally load all users initially
+    const loadUsers = async () => {
+      try {
+        const res = await userAPI.get('/users');
+        setUsers(res.data);
+      } catch (err) {
+        console.error('Error loading users:', err);
+      }
+    };
+    loadUsers();
+  }, []);
 
   return (
     <div className="max-w-lg mx-auto mt-8">

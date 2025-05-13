@@ -1,20 +1,54 @@
+// src/components/auth/RegisterForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { registerUser } from '../../api/auth';
 
 const RegisterForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const [error, setError] = useState('');
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // Dummy register logic (replace with real registration)
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-    } else {
-      navigate('/auth');
+    
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords don't match");
+      return;
+    }
+    
+    try {
+      // Call registerUser from auth API
+      const response = await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
+      
+      // Auto login after successful registration
+      const res = await login(response.data.user, response.data.token);
+      
+      if (res.success) {
+        navigate('/');
+      } else {
+        setError(res.message || 'Registration failed');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -24,27 +58,48 @@ const RegisterForm = () => {
       {error && <div className="text-red-500 mb-4">{error}</div>}
       <form onSubmit={handleRegister} className="space-y-4">
         <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
+          placeholder="Name"
+          required
+        />
+        <input
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           placeholder="Email"
+          required
         />
         <input
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           placeholder="Password"
+          required
         />
         <input
           type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           placeholder="Confirm Password"
+          required
         />
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">Register</button>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded"
+          disabled={loading}
+        >
+          {loading ? 'Registering...' : 'Register'}
+        </button>
       </form>
     </div>
   );

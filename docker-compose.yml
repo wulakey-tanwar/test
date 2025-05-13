@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - auth_service
+      - post_service
+      - user_service
+      - comment_service
+    networks:
+      - fullstack
+
+  auth_service:
+    build: ./backend/auth_service
+    container_name: auth_service
+    ports:
+      - "8000:800"
+    networks:
+      - fullstack
+
+  post_service:
+    build: ./backend/post_service
+    container_name: post_service
+    ports:
+      - "8002:8002"
+    networks:
+      - fullstack
+
+  user_service:
+    build: ./backend/user_service
+    container_name: user_service
+    ports:
+      - "8001:8001"
+    networks:
+      - fullstack
+
+  comment_service:
+    build: ./backend/comment_service
+    container_name: comment_service
+    ports:
+      - "8003:8003"
+    networks:
+      - fullstack
+
+networks:
+  fullstack:

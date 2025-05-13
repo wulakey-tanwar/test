@@ -1,22 +1,14 @@
-import { getToken } from '../utils/localStorage.js';
-const BASE_URL = import.meta.env.VITE_API_URL;
+// src/api/comment.js
+import commentAPI from './commentAxios';
 
-export async function fetchComments(postId) {
-  const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
-  return res.json();
-}
+// Create a new comment
+export const createComment = async (postId, commentData) => {
+  const response = await commentAPI.post(`/posts/${postId}/comments`, commentData);
+  return response.data;
+};
 
-export async function createComment(postId, comment) {
-  const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${getToken()}`,
-    },
-    body: JSON.stringify(comment),
-  });
-  return res.json();
-}
-
+// Fetch comments for a post
+export const fetchComments = async (postId) => {
+  const response = await commentAPI.get(`/posts/${postId}/comments`);
+  return response.data;
+};
