@@ -2,19 +2,19 @@ import axios from 'axios';
 
 // Create axios instances for different services
 const authApi = axios.create({
-  baseURL: process.env.REACT_APP_AUTH_SERVICE_URL || 'http://localhost:8001',
+  baseURL: process.env.REACT_APP_AUTH_SERVICE_URL || 'http://localhost:8000',
 });
 
 const userApi = axios.create({
-  baseURL: process.env.REACT_APP_USER_SERVICE_URL || 'http://localhost:8002',
+  baseURL: process.env.REACT_APP_USER_SERVICE_URL || 'http://localhost:8001',
 });
 
 const postApi = axios.create({
-  baseURL: process.env.REACT_APP_POST_SERVICE_URL || 'http://localhost:8003',
+  baseURL: process.env.REACT_APP_POST_SERVICE_URL || 'http://localhost:8002',
 });
 
 const commentApi = axios.create({
-  baseURL: process.env.REACT_APP_COMMENT_SERVICE_URL || 'http://localhost:8004',
+  baseURL: process.env.REACT_APP_COMMENT_SERVICE_URL || 'http://localhost:8003',
 });
 
 // Auth Service API calls

@@ -36,29 +36,20 @@ RUN npm run build
 
 # Step 2: Serve the app with a lightweight web server
 
+# Step 2: Serve the app with Nginx
 FROM nginx:stable-alpine
 
-
-
 # Remove default nginx static assets
-
 RUN rm -rf /usr/share/nginx/html/*
 
-
-
-# Copy built assets from builder
-
+# Copy built Vite app from builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-
-
+# Copy custom nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port
-
 EXPOSE 80
 
-
-
-# Start nginx server
-
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
